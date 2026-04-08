@@ -5,19 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameMart Landing Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // SILAHKAN ISI dengan konfigurasi dari Firebase Console Anda
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+        const facebookProvider = new FacebookAuthProvider();
+
+        // Ekspos fungsi ke jendela (window) agar bisa dipanggil oleh onclick di HTML
+        window.loginWithGoogle = async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                alert("Berhasil Login! Halo, " + user.displayName);
+                document.getElementById('authModal').classList.remove('active');
+                document.getElementById('loginBtn').innerText = user.displayName.split(' ')[0].toUpperCase();
+            } catch (error) {
+                console.error(error);
+                alert("Gagal Login Google: " + error.message);
+            }
+        };
+
+        window.loginWithFB = async () => {
+            try {
+                const result = await signInWithPopup(auth, facebookProvider);
+                alert("Berhasil Login Facebook! Halo, " + result.user.displayName);
+                document.getElementById('authModal').classList.remove('active');
+            } catch (error) {
+                console.error(error);
+                alert("Gagal Login Facebook. Pastikan App ID sudah dikonfigurasi di Firebase.");
+            }
+        };
+    </script>
+
     <style>
         body { background-color: #0a192f; }
+        /* Style Tambahan untuk Modal */
+        .auth-modal { display: none; }
+        .auth-modal.active { display: flex; animation: fadeIn 0.3s ease-out; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a192f; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
     </style>
 </head>
 <body class="text-white font-sans">
 
-    <header class="bg-white text-gray-800 p-4">
+    <header class="bg-white text-gray-800 p-4 sticky top-0 z-40 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold italic">GAMEMART</h1>
+            <h1 class="text-2xl font-bold italic tracking-tighter">GAMEMART</h1>
             <div class="flex-1 mx-10">
-                <input type="text" placeholder="Search The Game..." class="w-full border border-gray-300 rounded-full px-4 py-1 text-sm focus:outline-none">
+                <input type="text" placeholder="Search The Game..." class="w-full border border-gray-300 rounded-full px-4 py-1 text-sm focus:outline-none focus:border-blue-500 transition">
             </div>
-            <button class="font-semibold text-sm">LOGIN</button>
+            <button id="loginBtn" class="font-semibold text-sm hover:text-blue-700 transition duration-300">LOGIN</button>
         </div>
     </header>
 
@@ -32,114 +89,216 @@
     </nav>
 
     <section class="container mx-auto mt-6 px-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="h-48 bg-gray-700 rounded overflow-hidden relative border border-blue-400">
-            <img src="https://i.pinimg.com/1200x/c1/57/8c/c1578c0e365f48c8e64908c6ad1c76fa.jpg" alt="Game 1" class="w-full h-full object-cover opacity-80">
+        <div class="h-48 bg-gray-700 rounded-lg overflow-hidden relative border border-blue-400 group">
+            <img src="https://i.pinimg.com/1200x/c1/57/8c/c1578c0e365f48c8e64908c6ad1c76fa.jpg" alt="Game 1" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition duration-500">
         </div>
-        <div class="h-48 bg-gray-700 rounded overflow-hidden relative border border-blue-400">
-            <img src="https://i.pinimg.com/1200x/de/14/11/de1411a4e0cbb2acda901c522100328c.jpg" alt="Game 2" class="w-full h-full object-cover">
+        <div class="h-48 bg-gray-700 rounded-lg overflow-hidden relative border border-blue-400 group">
+            <img src="https://i.pinimg.com/1200x/de/14/11/de1411a4e0cbb2acda901c522100328c.jpg" alt="Game 2" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
         </div>
-        <div class="h-48 bg-gray-700 rounded overflow-hidden relative border border-blue-400">
-            <img src="https://i.pinimg.com/736x/58/cf/5f/58cf5f7a5606689e3190f9debc5f1912.jpg" alt="Game 3" class="w-full h-full object-cover opacity-80">
+        <div class="h-48 bg-gray-700 rounded-lg overflow-hidden relative border border-blue-400 group">
+            <img src="https://i.pinimg.com/736x/58/cf/5f/58cf5f7a5606689e3190f9debc5f1912.jpg" alt="Game 3" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition duration-500">
         </div>
     </section>
 
     <section class="container mx-auto mt-8 px-4 grid grid-cols-2 gap-4 max-w-2xl">
-        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition">NEW RELEASES</button>
-        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition">FREE GAME</button>
-        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition">SPECIALS</button>
-        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition">BEST SELLING</button>
+        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition font-bold text-xs tracking-widest">NEW RELEASES</button>
+        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition font-bold text-xs tracking-widest">FREE GAME</button>
+        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition font-bold text-xs tracking-widest">SPECIALS</button>
+        <button class="bg-[#112240] border border-blue-900 py-3 rounded shadow-lg hover:bg-blue-800 transition font-bold text-xs tracking-widest">BEST SELLING</button>
     </section>
 
     <section class="container mx-auto mt-12 px-4">
-        <h2 class="text-sm font-bold tracking-widest mb-4">BROWSE BY CATEGORY</h2>
-        <div class="grid grid-cols-3 gap-4">
-            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900">Action</div>
-            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900">RPG</div>
-            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900">SPORTS</div>
-            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900">ADVENTURE</div>
-            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900">SIMULATION</div>
-            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900">STRATEGY</div>
+        <h2 class="text-sm font-bold tracking-widest mb-4 opacity-70">BROWSE BY CATEGORY</h2>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
+            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900 transition text-sm">Action</div>
+            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900 transition text-sm">RPG</div>
+            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900 transition text-sm">SPORTS</div>
+            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900 transition text-sm">ADVENTURE</div>
+            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900 transition text-sm">SIMULATION</div>
+            <div class="bg-[#112240] py-4 text-center rounded border border-blue-900 cursor-pointer hover:bg-blue-900 transition text-sm">STRATEGY</div>
         </div>
     </section>
 
     <section class="container mx-auto mt-12 px-4">
-        <h2 class="text-sm font-bold tracking-widest mb-4">FEATURED COLLECTION</h2>
+        <h2 class="text-sm font-bold tracking-widest mb-4 opacity-70 uppercase">Featured Collection</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-gradient-to-b from-[#112240] to-transparent p-6 rounded border-l-2 border-blue-500">
+            <div class="bg-gradient-to-b from-[#112240] to-transparent p-6 rounded-lg border-l-4 border-blue-500 cursor-pointer hover:from-[#1a2d50] transition">
                 <h3 class="font-bold">MORE GAMES</h3>
                 <p class="text-xs text-gray-400 mt-2">Discover missing title games</p>
             </div>
-            <div class="bg-gradient-to-b from-[#112240] to-transparent p-6 rounded border-l-2 border-blue-500">
+            <div class="bg-gradient-to-b from-[#112240] to-transparent p-6 rounded-lg border-l-4 border-blue-500 cursor-pointer hover:from-[#1a2d50] transition">
                 <h3 class="font-bold">ASIA EXCLUSIVE</h3>
                 <p class="text-xs text-gray-400 mt-2">Latest Asian releases</p>
             </div>
-            <div class="bg-gradient-to-b from-[#112240] to-transparent p-6 rounded border-l-2 border-blue-500">
+            <div class="bg-gradient-to-b from-[#112240] to-transparent p-6 rounded-lg border-l-4 border-blue-500 cursor-pointer hover:from-[#1a2d50] transition">
                 <h3 class="font-bold">MULTIPLAYER HITS</h3>
                 <p class="text-xs text-gray-400 mt-2">Play with friends</p>
             </div>
         </div>
     </section>
 
-    <section class="mt-16 bg-[#004aad] py-10 text-center">
-        <h2 class="text-xl font-bold uppercase mb-2">Stay Update</h2>
-        <p class="text-sm mb-6">Get the latest game releases and exclusive deals delivered to your inbox</p>
-        <div class="flex justify-center max-w-md mx-auto">
-            <input type="email" placeholder="Your Email Address" class="flex-1 bg-[#0a192f] border border-blue-900 px-4 py-2 text-sm focus:outline-none">
-            <button class="bg-[#0a192f] border border-blue-900 px-6 py-2 ml-2 hover:bg-blue-900 transition font-bold">SEND</button>
+    <section class="mt-16 bg-[#004aad] py-10 text-center px-4">
+        <h2 class="text-xl font-bold uppercase mb-2 tracking-widest">Stay Update</h2>
+        <p class="text-sm mb-6 opacity-90">Get the latest game releases and exclusive deals delivered to your inbox</p>
+        <div class="flex flex-col md:flex-row justify-center max-w-md mx-auto gap-2">
+            <input type="email" placeholder="Your Email Address" class="flex-1 bg-[#0a192f] border border-blue-900 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20">
+            <button class="bg-[#0a192f] border border-blue-900 px-8 py-2 hover:bg-blue-900 transition font-bold tracking-widest text-sm">SEND</button>
         </div>
     </section>
 
     <section class="container mx-auto my-12 px-4 grid grid-cols-3 gap-4 text-center">
-        <div class="bg-[#112240] py-6 rounded text-xl font-bold">500+</div>
-        <div class="bg-[#112240] py-6 rounded text-xl font-bold">1000+</div>
-        <div class="bg-[#112240] py-6 rounded text-xl font-bold">90%</div>
+        <div class="bg-[#112240] py-6 rounded-xl border border-blue-900/50">
+            <div class="text-2xl font-black text-blue-400">500+</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-tighter">Games</div>
+        </div>
+        <div class="bg-[#112240] py-6 rounded-xl border border-blue-900/50">
+            <div class="text-2xl font-black text-blue-400">1000+</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-tighter">Users</div>
+        </div>
+        <div class="bg-[#112240] py-6 rounded-xl border border-blue-900/50">
+            <div class="text-2xl font-black text-blue-400">90%</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-tighter">Discount</div>
+        </div>
     </section>
 
-    <footer class="bg-[#0a192f] border-t border-gray-700 pt-12 pb-6 px-4">
+    <footer class="bg-[#0a192f] border-t border-gray-800 pt-12 pb-6 px-4 mt-20">
         <div class="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             <div>
                 <h4 class="font-bold mb-4">GAMEMART</h4>
                 <p class="text-xs text-gray-400 leading-relaxed">Top platform for gaming and digital needs in the country.</p>
             </div>
             <div>
-                <h4 class="font-bold mb-4">BROWSE</h4>
+                <h4 class="font-bold mb-4 text-sm">BROWSE</h4>
                 <ul class="text-xs text-gray-400 space-y-2">
-                    <li>All Games</li>
-                    <li>New Releases</li>
-                    <li>Best Sellers</li>
-                    <li>Specials</li>
+                    <li class="hover:text-white cursor-pointer transition">All Games</li>
+                    <li class="hover:text-white cursor-pointer transition">New Releases</li>
+                    <li class="hover:text-white cursor-pointer transition">Best Sellers</li>
+                    <li class="hover:text-white cursor-pointer transition">Specials</li>
                 </ul>
             </div>
             <div>
-                <h4 class="font-bold mb-4">SUPPORT</h4>
+                <h4 class="font-bold mb-4 text-sm">SUPPORT</h4>
                 <ul class="text-xs text-gray-400 space-y-2">
-                    <li>Help Centre</li>
-                    <li>Contact Us</li>
-                    <li>FAQ</li>
-                    <li>System Status</li>
+                    <li class="hover:text-white cursor-pointer transition">Help Centre</li>
+                    <li class="hover:text-white cursor-pointer transition">Contact Us</li>
+                    <li class="hover:text-white cursor-pointer transition">FAQ</li>
+                    <li class="hover:text-white cursor-pointer transition">System Status</li>
                 </ul>
             </div>
             <div>
-                <h4 class="font-bold mb-4">LEGAL</h4>
+                <h4 class="font-bold mb-4 text-sm">LEGAL</h4>
                 <ul class="text-xs text-gray-400 space-y-2">
-                    <li>Privacy Policy</li>
-                    <li>Terms of Service</li>
-                    <li>Cookies</li>
-                    <li>IP Protection</li>
+                    <li class="hover:text-white cursor-pointer transition">Privacy Policy</li>
+                    <li class="hover:text-white cursor-pointer transition">Terms of Service</li>
+                    <li class="hover:text-white cursor-pointer transition">Cookies</li>
                 </ul>
             </div>
         </div>
         <hr class="border-gray-800 mb-6">
-        <div class="container mx-auto flex flex-col md:row justify-between items-center text-[10px] text-gray-500">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-500 gap-4">
             <p>© 2024 GAMEMART. All rights reserved.</p>
-            <div class="flex gap-4 mt-4 md:mt-0">
-                <span>Twitter</span>
-                <span>Discord</span>
-                <span>Instagram</span>
-                <span>Youtube</span>
+            <div class="flex gap-6 uppercase font-bold">
+                <span class="hover:text-white cursor-pointer">Twitter</span>
+                <span class="hover:text-white cursor-pointer">Discord</span>
+                <span class="hover:text-white cursor-pointer">Instagram</span>
+                <span class="hover:text-white cursor-pointer">Youtube</span>
             </div>
         </div>
     </footer>
+
+    <div id="authModal" class="auth-modal fixed inset-0 z-50 bg-black/80 items-center justify-center p-4">
+        <div class="bg-[#0a192f] w-full max-w-xl rounded-2xl overflow-hidden border border-gray-800 shadow-2xl relative">
+            
+            <header class="bg-white px-8 py-5 flex justify-between items-center border-b-4 border-blue-500">
+                <div class="flex flex-col">
+                    <h1 id="authTitle" class="text-2xl font-black italic text-black uppercase leading-none">LOGIN</h1>
+                    <div id="authNavText" class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                        Have an account? <button onclick="switchForm('signup1')" class="text-black hover:underline">SIGN UP</button>
+                    </div>
+                </div>
+                
+                <button id="closeModal" class="text-gray-400 hover:text-red-500 text-4xl font-light transition-colors ml-4">&times;</button>
+            </header>
+
+            <main class="p-10">
+                <div id="form-login" class="form-section active space-y-6">
+                    <input type="text" placeholder="Email Or Phone" class="w-full bg-white text-gray-900 px-6 py-4 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/20 transition shadow-sm border-2 border-transparent">
+                    <div class="relative">
+                        <input type="password" placeholder="Password" class="w-full bg-white text-gray-900 px-6 py-4 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/20 transition shadow-sm border-2 border-transparent">
+                        <a href="#" class="text-[10px] text-gray-400 mt-2 inline-block hover:underline">Forgot Email?</a>
+                    </div>
+                    <button class="w-full border-2 border-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-white hover:text-slate-900 transition-all duration-300">LOGIN</button>
+                    
+                    <div class="text-center text-[10px] text-gray-500 uppercase tracking-widest py-2">Or sign in with</div>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="loginWithGoogle()" class="p-3 bg-white rounded-full hover:scale-110 transition shadow-md border border-gray-100"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6"></button>
+                        <button onclick="loginWithFB()" class="p-3 bg-white rounded-full hover:scale-110 transition shadow-md border border-gray-100"><img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-6 h-6"></button>
+                    </div>
+                </div>
+
+                <div id="form-signup1" class="form-section space-y-6 text-center">
+                    <h2 class="text-3xl font-black italic uppercase mb-8 tracking-tighter">SIGN UP</h2>
+                    <div class="text-left space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 ml-2 uppercase">Country/Region</label>
+                        <select class="w-full bg-white text-gray-900 px-6 py-4 rounded-xl outline-none cursor-pointer border-2 border-transparent focus:border-blue-500">
+                            <option>Indonesia</option>
+                            <option>Malaysia</option>
+                            <option>Singapore</option>
+                        </select>
+                    </div>
+                    <div class="text-left space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 ml-2 uppercase">Date of Birth</label>
+                        <input type="text" placeholder="dd/mm/yyyy" class="w-full bg-white text-gray-900 px-6 py-4 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/20 transition">
+                    </div>
+                    <button onclick="switchForm('signup2')" class="w-full bg-white text-slate-900 py-4 rounded-xl font-bold uppercase tracking-widest transition hover:bg-blue-50 shadow-lg">Continue</button>
+                </div>
+
+                <div id="form-signup2" class="form-section space-y-4 text-center">
+                    <h2 class="text-3xl font-black italic uppercase tracking-tighter">GAMEMART</h2>
+                    <div class="py-4">
+                        <p class="font-bold text-blue-100 uppercase tracking-widest text-lg">What's Your Name?</p>
+                        <p class="text-[11px] text-gray-400 px-6 mt-2 leading-relaxed">Your real name may be used later to verify your identity. By default, your name will not be publicly visible.</p>
+                    </div>
+                    <input type="text" placeholder="Your Name" class="w-full bg-white text-gray-900 px-6 py-4 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/20 transition shadow-inner">
+                    <input type="text" placeholder="Date of Birth (dd/mm/yyyy)" class="w-full bg-white text-gray-900 px-6 py-4 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/20 transition shadow-inner">
+                    <button class="w-full bg-white text-slate-900 py-4 rounded-xl font-bold uppercase tracking-widest transition hover:bg-blue-50 shadow-lg">Continue</button>
+                    <button onclick="switchForm('signup1')" class="text-xs text-gray-500 hover:text-white transition mt-6 block w-full uppercase font-bold tracking-widest">Go Back</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('authModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const closeModal = document.getElementById('closeModal');
+        const authTitle = document.getElementById('authTitle');
+        const authNavText = document.getElementById('authNavText');
+
+        // Buka Modal
+        loginBtn.onclick = () => {
+            modal.classList.add('active');
+            switchForm('login');
+        };
+
+        // Tutup Modal
+        closeModal.onclick = () => modal.classList.remove('active');
+        window.onclick = (event) => { if (event.target == modal) modal.classList.remove('active'); };
+
+        // Fungsi Switch Form (Login <-> Sign Up)
+        function switchForm(formId) {
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            document.getElementById('form-' + formId).classList.add('active');
+
+            if (formId === 'login') {
+                authTitle.innerText = 'LOGIN';
+                authNavText.innerHTML = 'Have an account? <button onclick="switchForm(\'signup1\')" class="text-black hover:underline transition">SIGN UP</button>';
+            } else {
+                authTitle.innerText = 'LOGIN'; 
+                authNavText.innerHTML = 'Already have an account? <button onclick="switchForm(\'login\')" class="text-black hover:underline transition">LOG IN</button>';
+            }
+        }
+    </script>
 
 </body>
 </html>
